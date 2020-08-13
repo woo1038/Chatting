@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>friend</title>
+
+    <!-- css -->
+    <link rel="stylesheet" href="/friend.css">
+    <!-- icon css -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <i class="fa fa-comment" aria-hidden="true"></i>
+
+        <form action="/chat_list" method="GET">
+            <button class="btn" type="submit">
+                <i class="fa fa-user" aria-hidden="true"></i>
+            </button>
+        </form>
+
+
+        <form id="logout" action="/logout" method="GET">
+            <button class="btn logout" type="submit">
+                <i class="fa fa-sign-out" aria-hidden="true"></i>
+            </button>
+        </form>
+    </header>
+
+
+    <section>
+        <h1>친구</h1>
+
+        <ul class="ul">
+            <li class="me"><%= me %></li>
+        </ul>
+
+        <div class="inner">
+            <form id="form" action="/friends" method="POST">
+                <div class="search_container">
+                    <input type="text" name='name' class="search_text" placeholder="추가할 친구 ID">
+                    <div class="solid">
+                        <span name='hello' class="search_id"><%= hello %></span>
+                    </div>
+                </div>
+            </form>
+
+            <form action="/friends" method="GET">
+                <button class="add">
+                    <i class="fa fa-plus-square" aria-hidden="true"></i>
+                </button>
+            </form>
+        </div>
+
+        <div class="friend_cnt">친구 <%= friends.length %></div>
+
+        <ul class="ul">
+            <% for(let i=0; i<friends.length; i++) { %>
+                <a class="chat" href="/chat/<%= friends[i].user_key %><%= friends[i].friend_key %>" target="_blank">
+                    <li>
+                        <div class="text_container">
+                            <%= friends[i].friend_displayName %>
+                        </div>
+                    </li>
+                </a>
+            <% } %> 
+        </ul>
+    </section>
+
+
+
+</body>
+<script>
+    let name = document.querySelector('.search_id');
+    if(name.innerText === 'name') {
+        name.style.color = '#535353';
+    }else {
+        name.style.color = '#000';
+    }
+</script>
+
+</html>

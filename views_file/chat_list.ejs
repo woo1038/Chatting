@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>chat_list</title>
+
+  <!-- css -->
+  <link rel="stylesheet" href="/chat_list.css">
+  <!-- icon css -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+
+  <header class="header">
+    <form action="/friends" method="GET">
+      <button class="btn" type="submit">
+        <i class="fa fa-comment" aria-hidden="true"></i>
+      </button>
+    </form>
+
+    <i class="fa fa-user" aria-hidden="true"></i>
+
+    <form id="logout" action="/login" method="GET">
+      <button class="btn logout" type="submit">
+        <i class="fa fa-sign-out" aria-hidden="true"></i>
+      </button>
+    </form>
+  </header>
+
+  <section class="container">
+    
+    <h1>채팅</h1>
+
+    <ul id="chat">
+      <% for(let i=0; i<room.length; i++) { %>
+            <a href="chat/<%= room[i].room %>" target="_blank">
+                <li>
+                    <p><%= room[i].you_displayName %></p> 
+                    <p class="text"><%= room[i].msg %></p> 
+                </li>
+            </a>
+      <% } %> 
+    </ul>
+  </section>
+
+<script>
+
+</script>
+</body>
+</html>

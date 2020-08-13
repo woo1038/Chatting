@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>chat</title>
+  <!-- css -->
+  <link rel="stylesheet" href="/chat.css">
+  <!-- icon css -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+
+  <header class="header">
+    <div><%= you_displayName %></div>
+  </header>
+
+  <section class="container">
+    <!-- <form class="form-inline"> -->
+
+    <div class="inner">
+      <ul id="chat">
+        <% for(let i=0; i<msg.length; i++) { %>
+              <li>
+                <% if(msg[i].user_displayName !== my_displayName){ %>
+                    <span><%= msg[i].user_displayName %></span>
+                  <% } else { %>
+                    <span></span>
+                  <% } %>
+                <span class="text">
+                  <%= msg[i].user_msg %>
+                </span> 
+              </li>
+        <% } %> 
+      </ul>
+    </div>
+
+
+    <div class="summary">
+      <form class="form">
+        <input type="text" class="form-control" id="msg">
+        <button type="submit" class="form-btn">전송</button>
+      </form>
+    </div>
+    
+  </section>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    (() => {
+
+      // 룸으로 입장
+      var chat = io('http://localhost:3000/');
+      chat.emit('enter', {
+        room: '<%= room %>'
+      })
+
+      /* 메세지를 서버로 발신 */
+      const form = document.querySelector('.form');
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const msg = document.querySelector('#msg');
+        // 서버로 자신의 정보를 전송한다.
+        chat.emit("chat message", {
+          msg: msg.value,
+          me: '<%= my_key %>',
+          you: '<%= friend_key %>',
+          room: '<%= room %>',
+          my_displayName: '<%= my_displayName %>',
+          you_displayName: '<%= you_displayName %>'
+        });
+        msg.value = '';
+      })
+      
+      let cnt = 0;
+
+      const chat_data = document.querySelector('#chat');
+      // 서버로부터의 메시지가 수신되면
+      chat.on("chat message", function(data) {
+        /* 채팅 보이기 */
+        let create_li = document.createElement('li');
+        let create_span = document.createElement('span');
+        
+        /* 상대방 채팅은 왼쪽 자신의 채팅은 오른쪽 && 자신 아이디 안보이기 */
+        if('<%= my_displayName %>' === data.name) {
+          create_li.classList = 'right';
+          create_span.innerText = ' ';
+          cnt = 0;
+        } else {
+          /* 실시간으로 대화시 같은사람이 말할때 아이디 히든처리 */
+          cnt++;
+          if(cnt >= 2) {
+            /* 같은사람이 2번이상 말한경우 */
+            create_span.innerText = `${data.name}`;
+            create_span.style.visibility = 'hidden';
+          } else {
+            /* 한번만 말한경우 */
+            create_span.innerText = `${data.name}`;
+          }
+        }
+        let create_span_cls = document.createElement('span');
+        create_span_cls.classList = 'text';
+        create_span_cls.innerText = `${data.msg}`;
+
+        create_li.appendChild(create_span);
+        create_li.appendChild(create_span_cls);
+        chat_data.appendChild(create_li);
+
+
+        /* 실시간 채팅 아래로 포커스 */
+        create_li.scrollIntoView();
+      });
+
+      /* 새로고침시 텍스트 좌우정렬 */
+      let li_msg = document.getElementsByTagName('li');
+      for(let i=0; i<li_msg.length; i++) {
+        if(li_msg[i].childNodes[1].innerText !== '<%= you_displayName %>') {
+          li_msg[i].style.textAlign = 'right';
+        }
+      }
+
+      /* 채팅 아래로 포커스 */
+      li_msg[li_msg.length-1].scrollIntoView();
+
+
+      /* 상대방 채팅 이후에 또 상대방이 채팅을 할때 아이디 겹치는거 히든처리 */
+      let arr = [];
+      
+      for(let i=1; i<li_msg.length; i++) {
+        if(li_msg[i-1].childNodes[1].innerText === li_msg[i].childNodes[1].innerText && li_msg[i].childNodes[1].innerText === '<%= you_displayName %>') {
+          arr.push(i);
+        } 
+      }
+      
+      for(let i=0; i<=arr.length; i++) {
+        li_msg[arr[i]].childNodes[1].style.visibility = 'hidden'; 
+      }
+
+    })();
+
+    
+
+  </script>
+</body>
+</html>
